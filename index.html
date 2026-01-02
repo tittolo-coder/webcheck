@@ -28,11 +28,10 @@
     </button>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <script>
-        // Inizializzazione corretta: usiamo supabaseClient per evitare conflitti
         const SUPABASE_URL = 'https://ltrzpfwlootgaowlvons.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0cnpwZndsb290Z2Fvd2x2b25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTUzNzAsImV4cCI6MjA4MjkzMTM3MH0.BdtvaGc9LQeeaWYGkIvN1isBCNVbUrYJf_v03Gr1XtU';
+        const SUPABASE_KEY = 'YOUR_KEY';
         window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     </script>
 
@@ -40,9 +39,8 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            // Registrazione del service worker con percorso relativo esplicito
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker Registrato'))
+                .then(() => console.log('Service Worker Registrato'))
                 .catch(err => console.error('Errore SW:', err));
         }
     </script>

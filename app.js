@@ -10,7 +10,7 @@ async function loadData() {
         const { data, error } = await db
             .from('webcheck')
             .select('data')
-            .eq('id', 1) 
+            .eq('id', 1)
             .single();
 
         if (data) {
@@ -64,14 +64,14 @@ const render = () => {
             <div class="grid grid-cols-1 gap-2 mb-4">
                 ${site.tasks.map((task, tIdx) => `
                     <label class="flex items-center space-x-3 p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors">
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                        <input type="checkbox" ${task.completed ? 'checked' : ''}
                             onchange="toggleTask(${sIdx}, ${tIdx})"
                             class="w-5 h-5 text-blue-600 rounded">
                         <span class="${task.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${task.name}</span>
                     </label>
                 `).join('')}
             </div>
-            <textarea 
+            <textarea
                 oninput="updateNotes(${sIdx}, this.value)"
                 placeholder="Note libere..."
                 class="w-full p-2 text-sm bg-blue-50 rounded-lg outline-none border-none focus:ring-2 focus:ring-blue-200"
@@ -95,13 +95,11 @@ window.toggleTask = (sIdx, tIdx) => {
 window.updateNotes = (sIdx, value) => {
     state.sites[sIdx].notes = value;
     clearTimeout(window.noteTimeout);
-    window.noteTimeout = setTimeout(() => {
-        saveToCloud();
-    }, 1000); 
+    window.noteTimeout = setTimeout(() => saveToCloud(), 1000);
 };
 
 window.removeSite = (idx) => {
-    if(confirm('Eliminare il sito?')) {
+    if (confirm('Eliminare il sito?')) {
         state.sites.splice(idx, 1);
         saveToCloud();
     }
@@ -114,11 +112,11 @@ document.getElementById('add-site-btn').onclick = () => {
             name,
             notes: "",
             tasks: [
-                {name: "Backup Database", completed: false},
-                {name: "Backup Spazio Web", completed: false},
-                {name: "Update Core/Plugin", completed: false},
-                {name: "Check Sicurezza", completed: false},
-                {name: "Test Velocità", completed: false}
+                { name: "Backup Database", completed: false },
+                { name: "Backup Spazio Web", completed: false },
+                { name: "Update Core/Plugin", completed: false },
+                { name: "Check Sicurezza", completed: false },
+                { name: "Test Velocità", completed: false }
             ]
         });
         saveToCloud();
@@ -128,19 +126,22 @@ document.getElementById('add-site-btn').onclick = () => {
 // Caricamento iniziale
 if (db) { loadData(); }
 
-// Logica Tasto Refresh
-document.getElementById('refresh-btn').onclick = async () => {
-    const btn = document.getElementById('refresh-btn');
-    btn.innerText = "⏳";
-    
-    try {
-        if ('serviceWorker' in navigator) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (let registration of registrations) {
-                // Aggiorna il worker se possibile, ma non bloccare l'app se fallisce
-                await registration.update().catch(() => {});
-            }
-        }
-    } catch (err) {}
-    window.location.reload(true);
+// Refresh immediato
+document.getElementById('refresh-btn').onclick = () => {
+  showToast("Lista aggiornata");
+  setTimeout(() => window.location.reload(), 300);
 };
+
+// Toast UI
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.innerText = message;
+  toast.className = "fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg text-sm bg-green-600 text-white opacity-90 z-50";
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// Mostra toast al reload dell'app
+window.addEventListener("load", () => {
+  showToast("Lista aggiornata");
+});
