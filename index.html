@@ -12,31 +12,29 @@
 
     <header class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-10">
         <h1 class="text-xl font-bold">WebCheck 🛠️</h1>
-        <p class="text-sm opacity-80" id="current-month"></p>
+        <p class="text-sm opacity-80" id="current-month">Caricamento...</p>
     </header>
 
     <main id="app" class="p-4 max-w-2xl mx-auto">
         <div id="sites-container" class="space-y-4"></div>
     </main>
 
-    <button id="add-site-btn" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl text-3xl">+</button>
+    <button id="add-site-btn" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl text-3xl transition-transform active:scale-90">+</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://ltrzpfwlootgaowlvons.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0cnpwZndsb290Z2Fvd2x2b25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTUzNzAsImV4cCI6MjA4MjkzMTM3MH0.BdtvaGc9LQeeaWYGkIvN1isBCNVbUrYJf_v03Gr1XtU';
+        window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
 
     <script src="app.js"></script>
+    
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
     </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-    // Inizializza Supabase
-    const SUPABASE_URL = 'https://ltrzpfwlootgaowlvons.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0cnpwZndsb290Z2Fvd2x2b25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTUzNzAsImV4cCI6MjA4MjkzMTM3MH0.BdtvaGc9LQeeaWYGkIvN1isBCNVbUrYJf_v03Gr1XtU';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Rendiamolo disponibile globalmente
-    window.supabase = supabase;
-</script>
 </body>
 </html>
