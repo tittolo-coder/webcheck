@@ -3,10 +3,11 @@ const ASSETS = ['./', './index.html', './app.js', './manifest.json'];
 
 // Installazione: salva i file necessari
 self.addEventListener('install', e => {
-    self.skipWaiting(); // Forza il nuovo worker a diventare attivo subito
-    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+    self.skipWaiting(); // Forza l'attivazione immediata del nuovo codice
+    e.waitUntil(
+        caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    );
 });
-
 // Strategia Network First: prova il web, se fallisce usa la cache
 self.addEventListener('fetch', e => {
     e.respondWith(

@@ -139,3 +139,22 @@ if (db) {
 } else {
     console.error("Il client Supabase non è stato inizializzato correttamente.");
 }
+
+
+// Funzione per il tasto Aggiorna
+document.getElementById('refresh-btn').onclick = async () => {
+    // 1. Mostra un feedback visivo (opzionale)
+    const btn = document.getElementById('refresh-btn');
+    btn.innerText = "⏳";
+    
+    // 2. Se c'è un Service Worker, proviamo ad aggiornarlo
+    if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+            await registration.update();
+        }
+    }
+
+    // 3. Ricarica la pagina forzando il recupero dal server
+    window.location.reload(true);
+};
