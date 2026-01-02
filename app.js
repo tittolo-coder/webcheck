@@ -1,20 +1,17 @@
 const sitesContainer = document.getElementById('sites-container');
 const monthDisplay = document.getElementById('current-month');
-
-// Stato locale dell'applicazione
 let state = { lastUpdate: new Date().getMonth(), sites: [] };
 
-// Recupero il client Supabase inizializzato nell'index
-const db = window.dbClient;
+// Recuperiamo il client inizializzato nell'index
+const db = window.supabaseClient;
 
-// --- FUNZIONI DI COMUNICAZIONE CLOUD ---
-
+// 1. CARICA DATI DAL CLOUD
 async function loadData() {
     try {
         const { data, error } = await db
             .from('webcheck')
             .select('data')
-            .eq('id', 1)
+            .eq('id', 1) 
             .single();
 
         if (data) {
@@ -22,31 +19,29 @@ async function loadData() {
             checkMonthlyReset();
             render();
         } else {
-            // Se il database è vuoto (prima installazione), crea il record iniziale
-            console.log("Inizializzazione database...");
+            // Se non esiste il record ID 1, lo creiamo
             await db.from('webcheck').insert([{ id: 1, data: state }]);
             render();
         }
     } catch (err) {
-        console.error("Errore di caricamento:", err);
-        sitesContainer.innerHTML = `<p class="text-red-500 text-center">Errore di connessione. Verifica la tabella 'webcheck' su Supabase.</p>`;
+        console.error("Errore durante il caricamento:", err);
     }
 }
 
+// 2. SALVA DATI NEL CLOUD
 async function saveToCloud() {
-    const { error } = await db
-        .from('webcheck')
-        .update({ data: state })
-        .eq('id', 1);
-    
-    if (error) {
-        console.error("Errore durante il salvataggio:", error);
+    try {
+        await db
+            .from('webcheck')
+            .update({ data: state })
+            .eq('id', 1);
+        render();
+    } catch (err) {
+        console.error("Errore durante il salvataggio:", err);
     }
-    render();
 }
 
-// --- LOGICA APPLICATIVA ---
-
+// Controllo reset mensile
 const checkMonthlyReset = () => {
     const currentMonth = new Date().getMonth();
     if (state.lastUpdate !== currentMonth) {
@@ -63,30 +58,30 @@ const render = () => {
     monthDisplay.innerText = `Manutenzione di ${months[new Date().getMonth()]}`;
 
     if (state.sites.length === 0) {
-        sitesContainer.innerHTML = `<p class="text-center text-gray-400 mt-10 italic">Nessun sito presente. Clicca sul tasto + in basso.</p>`;
+        sitesContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Nessun sito aggiunto. Clicca "+" per iniziare.</p>';
         return;
     }
 
     sitesContainer.innerHTML = state.sites.map((site, sIdx) => `
-        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 ${getStatusColor(site)} transition-all">
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 ${getStatusColor(site)} mb-4">
             <div class="flex justify-between items-center mb-3">
                 <h2 class="font-bold text-lg text-gray-800">${site.name}</h2>
-                <button onclick="removeSite(${sIdx})" class="text-red-300 hover:text-red-500 text-sm transition-colors">Elimina</button>
+                <button onclick="removeSite(${sIdx})" class="text-red-400 hover:text-red-600 text-sm">Elimina</button>
             </div>
             <div class="grid grid-cols-1 gap-2 mb-4">
                 ${site.tasks.map((task, tIdx) => `
                     <label class="flex items-center space-x-3 p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors">
                         <input type="checkbox" ${task.completed ? 'checked' : ''} 
                             onchange="toggleTask(${sIdx}, ${tIdx})"
-                            class="w-5 h-5 text-blue-600 rounded border-gray-300">
-                        <span class="${task.completed ? 'line-through text-gray-400' : 'text-gray-700'} font-medium text-sm">${task.name}</span>
+                            class="w-5 h-5 text-blue-600 rounded">
+                        <span class="${task.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${task.name}</span>
                     </label>
                 `).join('')}
             </div>
             <textarea 
                 oninput="updateNotes(${sIdx}, this.value)"
-                placeholder="Note libere (es. credenziali, scadenze...)"
-                class="w-full p-2 text-sm bg-blue-50 border-none rounded-lg focus:ring-2 focus:ring-blue-100 outline-none resize-none placeholder-blue-300"
+                placeholder="Note libere per questo sito..."
+                class="w-full p-2 text-sm bg-blue-50 rounded-lg outline-none border-none focus:ring-2 focus:ring-blue-200 transition-all"
                 rows="2">${site.notes || ''}</textarea>
         </div>
     `).join('');
@@ -99,8 +94,7 @@ const getStatusColor = (site) => {
     return 'border-yellow-500';
 };
 
-// --- AZIONI UTENTE (WINDOW PER SCOPE GLOBALE) ---
-
+// Funzioni Globali
 window.toggleTask = (sIdx, tIdx) => {
     state.sites[sIdx].tasks[tIdx].completed = !state.sites[sIdx].tasks[tIdx].completed;
     saveToCloud();
@@ -115,14 +109,14 @@ window.updateNotes = (sIdx, value) => {
 };
 
 window.removeSite = (idx) => {
-    if(confirm('Sei sicuro di voler eliminare questo sito e i relativi dati di manutenzione?')) {
+    if(confirm('Sei sicuro di voler eliminare questo sito?')) {
         state.sites.splice(idx, 1);
         saveToCloud();
     }
 };
 
 document.getElementById('add-site-btn').onclick = () => {
-    const name = prompt("Inserisci il nome o l'URL del sito:");
+    const name = prompt("Inserisci il nome del sito:");
     if (name) {
         state.sites.push({
             name,
@@ -139,5 +133,9 @@ document.getElementById('add-site-btn').onclick = () => {
     }
 };
 
-// --- AVVIO ---
-document.addEventListener('DOMContentLoaded', loadData);
+// Avvio coordinato con il client Supabase
+if (db) {
+    loadData();
+} else {
+    console.error("Il client Supabase non è stato inizializzato correttamente.");
+}
