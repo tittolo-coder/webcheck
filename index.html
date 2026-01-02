@@ -27,5 +27,16 @@
             navigator.serviceWorker.register('sw.js');
         }
     </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // Inizializza Supabase
+    const SUPABASE_URL = 'https://ltrzpfwlootgaowlvons.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0cnpwZndsb290Z2Fvd2x2b25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTUzNzAsImV4cCI6MjA4MjkzMTM3MH0.BdtvaGc9LQeeaWYGkIvN1isBCNVbUrYJf_v03Gr1XtU';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Rendiamolo disponibile globalmente
+    window.supabase = supabase;
+</script>
 </body>
 </html>
