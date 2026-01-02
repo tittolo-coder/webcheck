@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCheck PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#2563eb">
+</head>
+<body class="bg-gray-100 min-h-screen pb-20">
+
+    <header class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-10">
+        <h1 class="text-xl font-bold">WebCheck 🛠️</h1>
+        <p class="text-sm opacity-80" id="current-month"></p>
+    </header>
+
+    <main id="app" class="p-4 max-w-2xl mx-auto">
+        <div id="sites-container" class="space-y-4"></div>
+    </main>
+
+    <button id="add-site-btn" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl text-3xl">+</button>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
